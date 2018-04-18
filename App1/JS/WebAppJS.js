@@ -5,6 +5,11 @@
     "esri/widgets/LayerList",
     "esri/widgets/Search",
     "esri/tasks/Locator",
+    "esri/layers/MapImageLayer",
+    "esri/widgets/Popup",
+    "esri/PopupTemplate",
+    "esri/tasks/IdentifyTask",
+    "esri/tasks/support/IdentifyParameters",
     "dojo/domReady!", ],
     function (Map,
         MapView,
@@ -12,13 +17,19 @@
         Legend,
         LayerList,
         Search,
-        Locator) {
+        Locator,
+        MapImageLayer,
+        Popup,
+        PopupTemplate,
+        IdentifyTask, 
+        IdentifyParameters) {
 
         //code starts
         var mapConfig = {
             basemap: "streets-night-vector",
             layers:[]
         };
+
 
         var myMap = new Map(mapConfig);
 
@@ -61,22 +72,42 @@
             field: "CLASS",
             uniqueValueInfos: [
                 { value: "I", symbol: freewaySymbol, label: "Interstates" },
-                { value: "U", symbol: highwaySymbol, label: "Highway"}
+                { value: "U", symbol: highwaySymbol, label: "Highway" }
             ]
-        }
+        };
 
         hwyRenderer.legendOptions = { title: "Road Types" };
 
+        var popup1 = {
+            title: "{ROUTE_NUM}",
+            content: "This is {DIST_MILES} miles long."
+        };
+
+        var popup2 = {
+            title: "{OBJECTID}",
+        };
+
         var myFeatureLayer = new FeatureLayer({
             url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/USA_Freeway_System/FeatureServer/2",
-            renderer: hwyRenderer
+            renderer: hwyRenderer,
+            popupTemplate: popup1
         });
     
         myMap.add(myFeatureLayer);
 
+       //*************************************************************
+        var service = new MapImageLayer({
+            url: "https://gis.tempe.gov/arcgis/rest/services/Transportation/Traffic_Count_Public/MapServer",
+            //sublayers: [{ id: 0, renderer: autoSymbol, }],
+            });
+
+        myMap.add(service);
+       //*************************************************************
+
+       
         var legend = new Legend({
             view: mapView,
-            layerInfos: [{ layer: myFeatureLayer, title: "Highways"}]
+            layerInfos: [{ layer: myFeatureLayer, title: "Highways" }, { layer: service, title: "Traffic Counts" }]
         });
 
         mapView.ui.add(legend, "top-right");
@@ -84,6 +115,7 @@
         var layerList = new LayerList({
             view: mapView
         });
+        
         // Adds widget below other elements in the top left corner of the view
         mapView.ui.add(layerList, { position: "bottom-right" });
 
@@ -123,6 +155,8 @@
             index: 2
         });
         //test to see if working
+
+
 
 //code ends
 });
