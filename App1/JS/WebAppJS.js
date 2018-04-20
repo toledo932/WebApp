@@ -25,12 +25,14 @@
         IdentifyParameters) {
 
         //code starts
+
+        //choose basemap
         var mapConfig = {
-            basemap: "streets-night-vector",
+            basemap: "gray",
             layers:[]
         };
 
-
+        //create a new map and map view
         var myMap = new Map(mapConfig);
 
         var mapView = new MapView({
@@ -40,13 +42,14 @@
             zoom: 12,
         });
 
+        //define symbols to be used by the renders
         var freewaySymbol = {
             type: "simple-line",
             style: "short-dash-dot-dot",
             join: "round",
             miterLimit: 12,
             width: 7,
-            color: [0, 255, 0, 1]
+            color: [0, 175, 0, 1]
         };
 
         var highwaySymbol = {
@@ -54,7 +57,7 @@
             style: "long-dash",
             cap: "round",
             width: 6,
-            color: [255, 255, 0, 1]
+            color: [175, 175, 0, 1]
         };
 
         var autoSymbol = {
@@ -62,9 +65,10 @@
             style: "dash-dot",
             cap: "round",
             width: 5,
-            color: [0, 255, 255, 1]
+            color: [0, 175, 175, 1]
         };
 
+        //define the renders
         var hwyRenderer = {
             type: "unique-value", // autocasts as new UniqueValueRenderer()
             defaultSymbol: autoSymbol,
@@ -76,11 +80,12 @@
             ]
         };
 
+
         hwyRenderer.legendOptions = { title: "Road Types" };
 
         var popup1 = {
-            title: "{ROUTE_NUM}",
-            content: "This is {DIST_MILES} miles long."
+            title: "Name: {ROUTE_NUM}",
+            content: "This section of the {ROUTE_NUM} is {DIST_MILES} miles long."
         };
 
         var popup2 = {
@@ -98,7 +103,13 @@
        //*************************************************************
         var service = new MapImageLayer({
             url: "https://gis.tempe.gov/arcgis/rest/services/Transportation/Traffic_Count_Public/MapServer",
-            //sublayers: [{ id: 0, renderer: autoSymbol, }],
+            sublayers: [{
+                id: 0,
+                popupTemplate: {
+                    title: "{ON_ST}",
+                    content: "<p>{Count1} cars going {Dir1}</p>" + "<p>{Count2} cars going {Dir2}</p>"
+                }
+            }],
             });
 
         myMap.add(service);
